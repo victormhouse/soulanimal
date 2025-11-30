@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>灵魂栖息地 | 动物塑性格测试</title>
+    <!-- 引入 Chart.js 用于绘制雷达图 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 引入题库文件 -->
+    <script src="quiz_data_advanced.js"></script>
+    <!-- 引入 Tailwind CSS (CDN版) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 自定义样式补充 */
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f4f7f2; /* 森系浅灰绿背景 */
+            color: #2c3e50;
+        }
+        .serif {
+            font-family: 'Noto Serif SC', serif;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card-shadow {
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+        }
+        /* 进度条动画 */
+        .progress-bar-fill {
+            transition: width 0.5s ease-out;
+        }
+        /* 选项按钮点击态 */
+        .option-btn:active {
+            transform: scale(0.98);
+        }
+        /* 隐藏滚动条但保留功能 */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* 统一页面高度最小值 */
+        .page-container {
+            min-height: 600px;
+        }
+        /* 雷达图容器优化 */
+        .radar-container {
+            max-height: 200px;
+        }
+        /* 标签样式优化 */
+        .tag-chip {
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- 1. 首页 (Landing Page) -->
+    <div id="page-landing" class="page-container w-full max-w-md bg-white rounded-3xl p-8 card-shadow text-center fade-in flex flex-col justify-center">
+        <div class="mb-6">
+            <span class="inline-block px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full tracking-widest mb-4">SOUL HABITAT</span>
+            <h1 class="text-4xl font-bold serif text-green-900 mb-2">灵魂栖息地</h1>
+            <p class="text-gray-500 text-sm">动物塑性格心理测试</p>
+        </div>
+        
+        <div class="my-8 relative">
+            <div class="absolute inset-0 flex items-center justify-center opacity-10">
+                <svg class="w-48 h-48" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12z" clip-rule="evenodd"/></svg>
+            </div>
+            <p class="serif text-lg leading-relaxed text-gray-700 italic relative z-10">
+                "每个人心中都住着一只野兽。<br>
+                它在孤独时苏醒，在喧嚣中沉睡。<br>
+                穿越这片迷雾森林，<br>
+                去见那个未曾谋面的自己。"
+            </p>
+        </div>
+
+        <div class="space-y-4 mt-auto">
+            <button onclick="startQuiz()" class="w-full bg-green-800 text-white py-4 rounded-xl font-medium hover:bg-green-900 transition shadow-lg flex items-center justify-center gap-2 group">
+                <span>开始旅程 (20题)</span>
+                <svg class="w-4 h-4 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </button>
+            <button onclick="showPokedex()" class="w-full bg-white border border-gray-200 text-gray-600 py-3 rounded-xl font-medium hover:bg-gray-50 transition">
+                查看动物图鉴
+            </button>
+        </div>
+        <p class="mt-6 text-xs text-gray-400">已有 24,592 人找到了自己的灵魂动物</p>
+    </div>
+
+    <!-- 2. 答题页 (Quiz Page) -->
+    <div id="page-quiz" class="hidden page-container w-full max-w-md bg-white rounded-3xl p-6 card-shadow flex flex-col">
+        <!-- 顶部进度 -->
+        <div class="flex items-center justify-between mb-6 text-xs text-gray-400 font-medium tracking-wider">
+            <span id="quiz-progress-text">第 01/20 题</span>
+            <button onclick="backToHome()" class="hover:text-gray-600">退出</button>
+        </div>
+        <div class="w-full h-1 bg-gray-100 rounded-full mb-8 overflow-hidden">
+            <div id="progress-bar" class="h-full bg-green-600 w-0 progress-bar-fill"></div>
+        </div>
+
+        <!-- 题目区域 -->
+        <div id="question-container" class="flex-1 flex flex-col fade-in">
+            <h2 id="question-text" class="text-xl serif font-bold text-gray-800 mb-8 leading-relaxed">
+                题目加载中...
+            </h2>
+            <div id="options-container" class="space-y-3">
+                <!-- 选项将通过JS动态插入 -->
+            </div>
+        </div>
+
+        <!-- 底部控制 -->
+        <div class="mt-6 flex justify-between items-center transition-opacity duration-300" id="quiz-controls">
+            <button onclick="prevQuestion()" class="text-gray-400 hover:text-gray-600 text-sm flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                上一题
+            </button>
+        </div>
+    </div>
+
+    <!-- 3. 加载页 (Loading) -->
+    <div id="page-loading" class="hidden page-container w-full max-w-md bg-white rounded-3xl p-8 card-shadow flex-col items-center justify-center text-center">
+        <div class="w-16 h-16 border-4 border-green-200 border-t-green-800 rounded-full animate-spin mb-6"></div>
+        <h3 class="serif text-xl text-gray-800 mb-2">正在绘制你的灵魂画像...</h3>
+        <p id="loading-text" class="text-sm text-gray-500">分析性格底色...</p>
+    </div>
+
+    <!-- 4. 结果页 (Result Page) -->
+    <div id="page-result" class="hidden w-full max-w-md bg-white rounded-3xl overflow-hidden card-shadow fade-in">
+        <!-- 结果卡片头部 (颜色会根据动物变化) -->
+        <div id="result-header" class="bg-gradient-to-br from-green-800 to-green-900 p-6 text-white relative overflow-hidden">
+            <div class="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
+            
+            <p class="text-xs tracking-[0.2em] opacity-80 mb-2">你的灵魂动物</p>
+            <h1 id="result-animal" class="text-3xl font-bold serif mb-1">雪豹</h1>
+            <p id="result-slogan" class="text-sm italic opacity-90 font-light">"孤傲的雪山哲人"</p>
+
+            <div class="mt-4 flex flex-wrap gap-2" id="result-tags">
+                <!-- Tags -->
+            </div>
+        </div>
+
+        <div class="p-6 space-y-6">
+            <!-- 描述与雷达图并排 -->
+            <div class="grid grid-cols-1 gap-6">
+                <!-- 性格分析 -->
+                <div>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">性格分析</h3>
+                    <p id="result-desc" class="text-gray-600 text-sm leading-7 text-justify">
+                        <!-- 描述文本 -->
+                    </p>
+                </div>
+
+                <!-- 能力维度 -->
+                <div class="bg-gray-50 rounded-2xl p-4">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 text-center">能力维度</h3>
+                    <div class="radar-container relative">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 社交关系 -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-green-50 rounded-xl p-4 text-center">
+                    <p class="text-xs text-green-600 mb-1 font-bold">灵魂伴侣</p>
+                    <p id="result-match" class="font-bold text-gray-800">水豚</p>
+                </div>
+                <div class="bg-red-50 rounded-xl p-4 text-center">
+                    <p class="text-xs text-red-600 mb-1 font-bold">性格冲突</p>
+                    <p id="result-enemy" class="font-bold text-gray-800">灰狼</p>
+                </div>
+            </div>
+
+            <!-- 按钮组 -->
+            <div class="space-y-3 pt-2">
+                <button onclick="location.reload()" class="w-full bg-gray-800 text-white py-3 rounded-xl font-medium hover:bg-gray-900 transition shadow-sm">
+                    重新测试
+                </button>
+                <button onclick="showPokedex()" class="w-full border border-gray-200 text-gray-600 py-3 rounded-xl font-medium hover:bg-gray-50 transition">
+                    查看所有动物
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. 图鉴页 (Pokedex) -->
+    <div id="page-pokedex" class="hidden fixed inset-0 bg-white z-50 overflow-y-auto no-scrollbar">
+        <div class="max-w-md mx-auto min-h-screen bg-gray-50">
+            <div class="sticky top-0 bg-white/80 backdrop-blur-md p-4 border-b border-gray-100 flex items-center justify-between z-10">
+                <h2 class="serif text-lg font-bold text-gray-800">动物图鉴</h2>
+                <button onclick="closePokedex()" class="p-2 bg-gray-100 rounded-full hover:bg-gray-200">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            
+            <div class="p-4 grid grid-cols-1 gap-4" id="pokedex-grid">
+                <!-- 动物卡片列表 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. 数据定义 (完整 20题 + 8动物) ---
+
+        const animals = {
+            "snow_leopard": {
+                name: "雪豹",
+                slogan: "孤高的雪山哲人",
+                tags: ["#独立", "#高智感", "#边界感", "#旁观者"],
+                color: "from-slate-700 to-slate-900",
+                desc: "你就像栖息在海拔4000米之上的雪豹。你并不厌恶社交，但你更迷恋那种能够掌控全场的孤独感。在人群中，你往往是那个话最少、但看得最透的人。你对他人的情绪变化极其敏感，但选择冷眼旁观，除非触及你的底线。你的温柔是稀缺资源，只留给极少数被你'圈进领地'的人。",
+                match: "水豚",
+                enemy: "金毛"
+            },
+            "golden_retriever": {
+                name: "金毛寻回犬",
+                slogan: "治愈系的小太阳",
+                tags: ["#社牛", "#高共情", "#忠诚", "#乐天派"],
+                color: "from-yellow-500 to-orange-600",
+                desc: "你是行走的能量源，永远对他人的痛苦无法视而不见。由于你对他人的信任阈值很低，常常被认为是'傻白甜'，但其实你只是选择了善良作为你的生存策略。你害怕冷场，害怕被抛弃，你的快乐来自于'被需要'。世界破破烂烂，你却总想缝缝补补。",
+                match: "仓鸮",
+                enemy: "雪豹"
+            },
+            "owl": {
+                name: "仓鸮",
+                slogan: "暗夜的守望者",
+                tags: ["#逻辑怪", "#极简主义", "#智性恋", "#冷静"],
+                color: "from-indigo-800 to-purple-900",
+                desc: "比起参与热闹的争论，你更喜欢站在上帝视角审视一切。你极其崇尚逻辑和效率，对于情绪化的宣泄感到难以理解甚至厌烦。你有很强的知识焦虑，总觉得懂的不够多。在朋友眼中，你像一本写满注脚的百科全书，冷静、客观，偶尔毒舌，但总是切中要害。",
+                match: "海豚",
+                enemy: "林鹿"
+            },
+            "dolphin": {
+                name: "海豚",
+                slogan: "自由的弄潮儿",
+                tags: ["#脑洞大", "#自由", "#浪漫", "#反骨"],
+                color: "from-cyan-500 to-blue-600",
+                desc: "你的脑洞比黑洞还大。常规和教条是你最大的敌人，你的一生都在追求新鲜感和可能性的路上。你非常聪明，但这种聪明往往不用在'正途'上，而是用来寻找捷径或制造惊喜。你看起来也是社交达人，但和金毛不同，你的社交是为了寻找有趣的灵魂，而不是为了陪伴。",
+                match: "仓鸮",
+                enemy: "灰狼"
+            },
+            "wolf": {
+                name: "灰狼",
+                slogan: "荒原的执行官",
+                tags: ["#野心", "#执行力", "#护短", "#现实"],
+                color: "from-stone-600 to-stone-800",
+                desc: "你拥有极强的目标感，一旦认准了猎物（目标），就会不惜一切代价咬住不放。你既能享受孤独的狩猎，也能领导团队的协作。你很现实，不喜欢空谈梦想，只看重结果。对于被你划分为'自己人'的伙伴，你会展现出极强的保护欲，对外人则冷酷无情。",
+                match: "水豚",
+                enemy: "海豚"
+            },
+            "capybara": {
+                name: "水豚",
+                slogan: "佛系的入定大师",
+                tags: ["#情绪稳定", "#随缘", "#钝感力", "#和平"],
+                color: "from-green-600 to-emerald-800",
+                desc: "精神状态极其美丽，天塌下来当被子盖。你拥有令人羡慕的'钝感力'，外界的焦虑和内卷很难干扰到你的节奏。你不是没有能力，只是觉得'没必要'。你随遇而安，无论把你自己放在什么环境中，你都能找到最舒服的姿势躺下。你是所有焦虑型人格的天然解药。",
+                match: "灰狼",
+                enemy: "蜜獾"
+            },
+            "deer": {
+                name: "林鹿",
+                slogan: "敏感的林间诗人",
+                tags: ["#敏感", "#文艺", "#洁癖", "#完美主义"],
+                color: "from-rose-400 to-pink-600",
+                desc: "你内心拥有一座精致的玻璃花园。你对美、艺术和氛围有极高的要求。你非常敏感，不仅是对他人的情绪，也包括对环境的噪音、气味。你常常陷入一种'虽然没事，但就是觉得忧伤'的情绪中。你渴望被理解，又害怕被看穿，永远与世界保持着一段优雅的距离。",
+                match: "灰狼",
+                enemy: "蜜獾"
+            },
+            "honey_badger": {
+                name: "蜜獾",
+                slogan: "无畏的逆行者",
+                tags: ["#硬刚", "#直率", "#行动派", "#不服输"],
+                color: "from-orange-700 to-red-800",
+                desc: "平头哥，生死看淡，不服就干。你最讨厌虚伪和弯弯绕绕，有话直说。如果生活给了你一巴掌，你的第一反应绝对不是哭泣，而是反手给生活一拳。你拥有极强的生命力和抗压能力，逆境只会让你更兴奋。虽然脾气爆，但你其实没什么心机。",
+                match: "水豚",
+                enemy: "林鹿"
+            }
+        };
+
+        // questions 数组已从外部文件 quiz_data_advanced.js 引入
+
+        // --- 2. 逻辑控制 ---
+
+        let currentQuestionIndex = 0;
+        let scores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
+        let historyStack = []; // 记录每一步的得分，用于返回上一题
+
+        // 页面切换工具
+        function showPage(pageId) {
+            document.querySelectorAll('body > div').forEach(div => {
+                if(div.id.startsWith('page-')) div.classList.add('hidden');
+                if(div.id === 'page-pokedex') div.classList.add('hidden'); // 特殊处理图鉴
+            });
+            const target = document.getElementById(pageId);
+            target.classList.remove('hidden');
+            if (pageId !== 'page-pokedex') target.classList.add('flex');
+            
+            // 滚动到顶部
+            window.scrollTo(0,0);
+        }
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            scores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
+            historyStack = [];
+            showPage('page-quiz');
+            renderQuestion();
+        }
+
+        function backToHome() {
+            if(confirm("确定要退出吗？当前进度将丢失。")) {
+                showPage('page-landing');
+            }
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQuestionIndex];
+            
+            // 更新进度条
+            const progress = ((currentQuestionIndex) / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            document.getElementById('quiz-progress-text').innerText = `第 ${currentQuestionIndex + 1}/${questions.length} 题`;
+
+            // 更新文本
+            document.getElementById('question-text').innerText = q.q;
+
+            // 更新选项
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn w-full text-left p-4 rounded-xl border border-gray-200 hover:border-green-600 hover:bg-green-50 transition duration-200 text-gray-700 text-sm font-medium leading-relaxed";
+                btn.innerText = opt.t;
+                btn.onclick = () => handleAnswer(opt.s);
+                
+                // 简单的入场动画
+                btn.style.opacity = '0';
+                btn.style.transform = 'translateY(10px)';
+                setTimeout(() => {
+                    btn.style.transition = 'all 0.4s ease';
+                    btn.style.opacity = '1';
+                    btn.style.transform = 'translateY(0)';
+                }, index * 100);
+
+                container.appendChild(btn);
+            });
+
+            // 底部控制栏显示逻辑
+            const controls = document.getElementById('quiz-controls');
+            if(currentQuestionIndex > 0) {
+                controls.classList.remove('opacity-0');
+            } else {
+                controls.classList.add('opacity-0');
+            }
+        }
+
+        function handleAnswer(scoreDelta) {
+            // 记录历史（深拷贝）
+            historyStack.push({ ...scores });
+
+            // 加分
+            for (let key in scoreDelta) {
+                if (scores.hasOwnProperty(key)) {
+                    scores[key] += scoreDelta[key];
+                }
+            }
+
+            // 下一题或结束
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0 && historyStack.length > 0) {
+                // 恢复分数
+                scores = historyStack.pop();
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        }
+
+        function finishQuiz() {
+            showPage('page-loading');
+            
+            // 模拟计算延迟动画
+            const loadingTexts = ["整合思维碎片...", "分析社交磁场...", "匹配灵魂原型...", "生成最终报告..."];
+            let step = 0;
+            const interval = setInterval(() => {
+                if (step < loadingTexts.length) {
+                    document.getElementById('loading-text').innerText = loadingTexts[step];
+                    step++;
+                }
+            }, 600);
+
+            setTimeout(() => {
+                clearInterval(interval);
+                calculateResult();
+            }, 2500);
+        }
+
+        // --- 3. 算法与渲染结果 ---
+
+        function calculateResult() {
+            // 计算四大维度的胜出方
+            // 维度1: E vs I
+            const dim1 = scores.E >= scores.I ? 'E' : 'I';
+            // 维度2: S vs N
+            const dim2 = scores.S >= scores.N ? 'S' : 'N';
+            // 维度3: T vs F
+            const dim3 = scores.T >= scores.F ? 'T' : 'F';
+            // 维度4: J vs P
+            const dim4 = scores.J >= scores.P ? 'J' : 'P';
+
+            // 组合 MBTI 字符串
+            const mbti = dim1 + dim2 + dim3 + dim4;
+
+            // 匹配动物 (简化版映射逻辑)
+            let animalKey = "capybara"; // 默认兜底
+
+            // 映射规则表
+            if (dim2 === 'N' && dim3 === 'F') { // 理想主义者 NF
+                if (dim1 === 'E') animalKey = dim4 === 'P' ? "dolphin" : "golden_retriever";
+                else animalKey = "deer";
+            } else if (dim2 === 'N' && dim3 === 'T') { // 理性者 NT
+                if (dim1 === 'I') animalKey = dim4 === 'J' ? "owl" : "snow_leopard";
+                else animalKey = "wolf"; // ENTJ/ENTP
+            } else if (dim2 === 'S' && dim4 === 'J') { // 护卫者 SJ
+                if (dim3 === 'T') animalKey = "wolf";
+                else animalKey = "golden_retriever";
+            } else if (dim2 === 'S' && dim4 === 'P') { // 技艺者 SP
+                if (dim3 === 'T') animalKey = "honey_badger";
+                else animalKey = "capybara";
+            }
+
+            renderResultPage(animalKey);
+            showPage('page-result');
+        }
+
+        function renderResultPage(key) {
+            const data = animals[key];
+            
+            // 填充文本
+            document.getElementById('result-animal').innerText = data.name;
+            document.getElementById('result-slogan').innerText = data.slogan;
+            document.getElementById('result-desc').innerText = data.desc;
+            document.getElementById('result-match').innerText = animals[data.match] ? animals[data.match].name : data.match;
+            document.getElementById('result-enemy').innerText = animals[data.enemy] ? animals[data.enemy].name : data.enemy;
+
+            // 填充头部颜色
+            const header = document.getElementById('result-header');
+            header.className = `p-6 text-white relative overflow-hidden bg-gradient-to-br ${data.color}`;
+
+            // 填充Tags
+            const tagsContainer = document.getElementById('result-tags');
+            tagsContainer.innerHTML = data.tags.map(t => `<span class="px-2 py-1 bg-white/20 rounded text-xs tag-chip">${t}</span>`).join('');
+
+            // 绘制雷达图
+            renderRadarChart();
+        }
+
+        let radarChartInstance = null;
+        function renderRadarChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            // 归一化分数为 0-100
+            const normalize = (val) => Math.min((val / 10) * 100, 100);
+
+            const dataValues = [
+                normalize(scores.E), // 社交力
+                normalize(scores.F), // 共情力
+                normalize(scores.N), // 想象力
+                normalize(scores.T), // 逻辑力
+                normalize(scores.J)  // 执行力
+            ];
+
+            if (radarChartInstance) radarChartInstance.destroy();
+
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['社交', '共情', '想象', '逻辑', '执行'],
+                    datasets: [{
+                        label: '能力维度',
+                        data: dataValues,
+                        backgroundColor: 'rgba(22, 101, 52, 0.2)', // green-800
+                        borderColor: 'rgba(22, 101, 52, 1)',
+                        pointBackgroundColor: 'rgba(22, 101, 52, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(22, 101, 52, 1)'
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            angleLines: { color: '#e5e7eb' },
+                            grid: { color: '#e5e7eb' },
+                            pointLabels: {
+                                font: { size: 11, family: "'Noto Sans SC', sans-serif" },
+                                color: '#6b7280'
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                            ticks: { display: false } // 隐藏刻度数字
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // --- 4. 图鉴系统 ---
+
+        function showPokedex() {
+            const grid = document.getElementById('pokedex-grid');
+            grid.innerHTML = '';
+            
+            Object.keys(animals).forEach(key => {
+                const a = animals[key];
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex gap-4 items-center hover:shadow-md transition";
+                card.innerHTML = `
+                    <div class="w-16 h-16 rounded-full bg-gradient-to-br ${a.color} flex items-center justify-center text-white text-xl font-bold serif shrink-0">
+                        ${a.name[0]}
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-gray-800">${a.name}</h4>
+                        <p class="text-xs text-gray-500 mb-1">${a.slogan}</p>
+                        <div class="flex gap-1 flex-wrap">
+                             ${a.tags.slice(0,2).map(t => `<span class="text-[10px] bg-gray-100 text-gray-500 px-1 rounded">${t}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            document.getElementById('page-pokedex').classList.remove('hidden');
+        }
+
+        function closePokedex() {
+            document.getElementById('page-pokedex').classList.add('hidden');
+        }
+
+    </script>
+</body>
+</html>
