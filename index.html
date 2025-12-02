@@ -11,7 +11,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script src="quiz_data_advanced.js"></script>
     <script src="quiz_data_60.js"></script>
@@ -21,10 +20,11 @@
     <style>
         body {
             font-family: 'Noto Sans SC', sans-serif;
-            background-color: #eef2f5; /* 整体背景改淡一点，突出卡片 */
-            color: #2c3e50;
+            background: linear-gradient(135deg, #e3f2fd 0%, #e8f5e9 100%);
+            color: #333;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
         }
         .serif { font-family: 'Noto Serif SC', serif; }
         .fade-in { animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
@@ -33,14 +33,19 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* 核心海报容器 */
+        /* 卡片容器 */
+        .page-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+
         .poster-card {
             box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2);
             overflow: hidden;
             position: relative;
         }
 
-        /* 噪点纹理（增加纸质感） */
         .texture-overlay {
             position: absolute;
             inset: 0;
@@ -50,16 +55,15 @@
             z-index: 1;
         }
 
-        /* 毛玻璃悬浮层 */
+        /* 结果页毛玻璃板 */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-top: 1px solid rgba(255,255,255,0.6);
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
+            background: rgba(255, 255, 255, 0.96); 
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 -15px 40px rgba(0,0,0,0.08);
         }
 
-        /* 装饰性光斑 */
         .glow-blob {
             position: absolute;
             border-radius: 50%;
@@ -71,34 +75,58 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* 选项按钮动画 */
         .option-btn:active { transform: scale(0.98); }
         .progress-bar-fill { transition: width 0.5s ease-out; }
 
-        /* Error Toast */
         .error-toast {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             background: #ef4444; color: white; padding: 12px 20px;
             border-radius: 8px; z-index: 1000; display: none; font-size: 14px;
         }
+        
+        .section-title {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 0.95rem;
+            letter-spacing: 0.05em;
+        }
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: #10b981;
+            border-radius: 50%;
+            margin-right: 8px;
+            vertical-align: middle;
+            transform: translateY(-1px);
+        }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="min-h-screen flex items-center justify-center p-4 relative">
+
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-green-200 rounded-full blur-[100px] opacity-40"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-100 rounded-full blur-[100px] opacity-40"></div>
+    </div>
 
     <div id="error-toast" class="error-toast"></div>
 
-    <div id="page-landing" class="w-full max-w-md bg-white rounded-[2rem] p-8 shadow-xl text-center fade-in flex flex-col justify-center min-h-[600px] relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-600 to-teal-600"></div>
+    <div id="page-landing" class="page-container w-full max-w-md rounded-[2rem] p-8 shadow-xl text-center fade-in flex flex-col justify-center min-h-[600px] relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-green-50 to-transparent -z-10"></div>
         
         <div class="mb-10 relative z-10">
-            <span class="inline-block px-4 py-1.5 bg-green-50 text-green-700 text-[10px] font-bold rounded-full tracking-[0.2em] mb-6 border border-green-100">SOUL HABITAT</span>
+            <span class="inline-block px-4 py-1.5 bg-green-100 text-green-800 text-xs font-bold rounded-full tracking-widest mb-6 border border-green-200 shadow-sm">动物塑测试</span>
             <h1 class="text-4xl font-bold serif text-gray-900 mb-3 tracking-tight">灵魂栖息地</h1>
-            <p class="text-gray-400 text-sm tracking-wide">探寻你内心深处的动物原型</p>
+            <p class="text-gray-500 text-sm tracking-wide">在喧嚣世界中，找回你失落的野性灵魂</p>
         </div>
         
         <div class="my-auto relative group cursor-default">
-            <div class="absolute inset-0 bg-green-100 rounded-full blur-3xl opacity-20 group-hover:opacity-30 transition duration-700"></div>
-            <p class="serif text-lg leading-loose text-gray-600 italic relative z-10 px-4">
+            <div class="absolute inset-0 bg-gradient-to-tr from-green-100 to-emerald-50 rounded-full blur-3xl opacity-60 group-hover:opacity-80 transition duration-700"></div>
+            <p class="serif text-lg leading-loose text-gray-700 italic relative z-10 px-4 drop-shadow-sm">
                 "每个人心中都住着一只野兽。<br>
                 它在孤独时苏醒，<br>
                 在喧嚣中沉睡。"
@@ -106,14 +134,15 @@
         </div>
 
         <div class="space-y-4 mt-auto relative z-10">
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="startQuiz('short')" class="bg-gray-900 text-white py-4 rounded-2xl font-medium hover:bg-black transition shadow-lg flex flex-col items-center justify-center gap-1 group">
-                    <span class="text-sm font-bold">开始旅程</span>
-                    <span class="text-[10px] opacity-60 group-hover:opacity-100 transition">快速测试 (20题)</span>
+            <div class="flex flex-col gap-3">
+                <button onclick="startQuiz('short')" class="w-full bg-white border-2 border-gray-100 text-gray-600 py-3.5 rounded-2xl font-medium hover:border-green-200 hover:text-green-700 hover:bg-green-50/50 transition flex items-center justify-center gap-2">
+                    <span class="text-sm">快速体验 (20题)</span>
                 </button>
-                <button onclick="startQuiz('long')" class="bg-white border-2 border-gray-100 text-gray-800 py-4 rounded-2xl font-medium hover:border-gray-300 transition flex flex-col items-center justify-center gap-1 group">
-                    <span class="text-sm font-bold">深度探索</span>
-                    <span class="text-[10px] text-gray-400 group-hover:text-gray-600 transition">完整分析 (60题)</span>
+
+                <button onclick="startQuiz('long')" class="w-full bg-green-900 text-white py-4 rounded-2xl font-medium hover:bg-green-800 hover:-translate-y-0.5 transition shadow-xl shadow-green-900/10 flex items-center justify-center gap-3 group relative overflow-hidden">
+                    <div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition"></div>
+                    <span class="text-lg font-bold">深度探索 (60题)</span>
+                    <span class="px-2 py-0.5 bg-white/20 rounded text-[10px] uppercase tracking-wider">推荐</span>
                 </button>
             </div>
             <button onclick="showPokedex()" class="w-full text-gray-400 text-xs py-3 hover:text-gray-600 transition flex items-center justify-center gap-1">
@@ -123,324 +152,358 @@
         </div>
     </div>
 
-    <div id="page-quiz" class="hidden w-full max-w-md bg-white rounded-[2rem] p-8 shadow-xl flex-col min-h-[600px] relative">
+    <div id="page-quiz" class="hidden page-container w-full max-w-md rounded-[2rem] p-8 shadow-xl flex-col min-h-[600px] relative">
         <div class="w-full h-1.5 bg-gray-100 rounded-full mb-8 overflow-hidden">
-            <div id="progress-bar" class="h-full bg-gray-900 w-0 progress-bar-fill"></div>
+            <div id="progress-bar" class="h-full bg-green-800 w-0 progress-bar-fill"></div>
         </div>
-
         <div class="flex-1 flex flex-col fade-in">
-            <span class="text-xs font-bold text-gray-300 tracking-widest mb-4 block" id="quiz-progress-text">QUESTION 01</span>
-            <h2 id="question-text" class="text-xl serif font-bold text-gray-800 mb-10 leading-relaxed">
-                题目加载中...
-            </h2>
-            <div id="options-container" class="space-y-3">
-                </div>
+            <span class="text-xs font-bold text-gray-300 tracking-widest mb-4 block" id="quiz-progress-text">第 01 题</span>
+            <h2 id="question-text" class="text-xl serif font-bold text-gray-800 mb-10 leading-relaxed">题目加载中...</h2>
+            <div id="options-container" class="space-y-3"></div>
         </div>
-
         <div class="mt-8 flex justify-between items-center opacity-0 transition-opacity" id="quiz-controls">
-            <button onclick="prevQuestion()" class="text-gray-400 hover:text-gray-900 text-xs font-bold uppercase tracking-wider flex items-center gap-2 px-2 py-2">
-                ← Back
-            </button>
-            <button onclick="backToHome()" class="text-gray-300 hover:text-red-400 text-xs">退出</button>
+            <button onclick="prevQuestion()" class="text-gray-400 hover:text-gray-900 text-xs font-bold tracking-wider flex items-center gap-2 px-2 py-2">← 上一题</button>
+            <button onclick="backToHome()" class="text-gray-300 hover:text-red-400 text-xs">退出测试</button>
         </div>
     </div>
 
-    <div id="page-loading" class="hidden w-full max-w-md bg-white rounded-[2rem] p-8 shadow-xl flex-col items-center justify-center text-center min-h-[600px]">
+    <div id="page-loading" class="hidden page-container w-full max-w-md rounded-[2rem] p-8 shadow-xl flex-col items-center justify-center text-center min-h-[600px]">
         <div class="relative w-20 h-20 mb-8">
             <div class="absolute inset-0 border-4 border-gray-100 rounded-full"></div>
-            <div class="absolute inset-0 border-4 border-gray-900 rounded-full border-t-transparent animate-spin"></div>
+            <div class="absolute inset-0 border-4 border-green-800 rounded-full border-t-transparent animate-spin"></div>
         </div>
         <h3 class="serif text-xl text-gray-900 mb-3 font-bold">正在绘制灵魂画像</h3>
-        <p id="loading-text" class="text-xs text-gray-400 tracking-widest uppercase">Analyzing Data...</p>
+        <p id="loading-text" class="text-xs text-gray-400 tracking-widest">正在分析性格底色...</p>
     </div>
 
     <div id="page-result" class="hidden w-full max-w-md rounded-[2rem] overflow-hidden poster-card fade-in relative min-h-[700px]">
-        
         <div id="poster-bg" class="absolute inset-0 bg-gradient-to-b from-gray-200 to-gray-400 transition-colors duration-700"></div>
-        
         <div class="texture-overlay"></div>
-
         <div class="glow-blob bg-white w-64 h-64 -top-10 -right-10 mix-blend-overlay"></div>
         <div class="glow-blob bg-black w-64 h-64 bottom-0 left-0 opacity-10"></div>
 
         <div class="relative h-full flex flex-col z-10">
-            
-            <div class="flex-1 flex flex-col items-center justify-center p-8 pb-12 text-center text-white">
+            <div class="flex-none pt-14 pb-8 text-center text-white px-6">
                 <div class="mb-4 animate-[bounce_3s_infinite]">
                     <span id="result-icon" class="text-7xl drop-shadow-2xl filter">✨</span>
                 </div>
-                <h1 id="result-animal" class="text-5xl font-bold serif mb-2 drop-shadow-md tracking-wider">动物名</h1>
-                <div class="flex items-center gap-3 opacity-90">
-                    <div class="h-[1px] w-8 bg-white/50"></div>
-                    <p id="result-slogan" class="text-sm font-light tracking-widest uppercase">Slogan</p>
-                    <div class="h-[1px] w-8 bg-white/50"></div>
-                </div>
+                <div class="inline-block px-3 py-1 border border-white/30 rounded-full text-[10px] tracking-widest mb-3 bg-white/10 backdrop-blur-sm">灵魂原型</div>
+                <h1 id="result-animal" class="text-5xl font-bold serif mb-3 drop-shadow-md tracking-wider">动物名</h1>
+                <p id="result-slogan" class="text-sm font-light tracking-widest opacity-90">Slogan</p>
                 
-                <div id="result-tags" class="flex flex-wrap justify-center gap-2 mt-6">
-                    </div>
+                <div id="result-tags" class="flex flex-wrap justify-center gap-2 mt-6"></div>
             </div>
 
-            <div class="glass-panel rounded-t-[2.5rem] p-8 pb-10 flex flex-col gap-6 transform translate-y-2">
+            <div class="glass-panel rounded-t-[2.5rem] p-8 pb-8 flex flex-col gap-8 transform translate-y-2 flex-1">
+                <div class="w-12 h-1 bg-gray-300 rounded-full mx-auto opacity-40 mb-2"></div>
                 
-                <div class="text-center">
-                    <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-6 opacity-50"></div>
-                    <p id="result-desc" class="text-gray-600 text-sm leading-7 font-light text-justify">
-                        描述文本...
-                    </p>
-                </div>
+                <div class="space-y-8">
+                    <div>
+                        <h3 class="section-title">深度侧写</h3>
+                        <p id="result-analysis" class="text-gray-600 text-sm leading-7 text-justify font-light">分析加载中...</p>
+                    </div>
 
-                <div class="relative">
-                    <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center mb-4">Dimension</h3>
-                    <div class="radar-container relative h-40">
-                        <canvas id="radarChart"></canvas>
+                    <div class="grid grid-cols-1 gap-8">
+                        <div>
+                            <h3 class="section-title">社交人格</h3>
+                            <p id="result-social" class="text-gray-600 text-sm leading-7 text-justify font-light">内容加载中...</p>
+                        </div>
+                        <div>
+                            <h3 class="section-title">能量来源</h3>
+                            <p id="result-energy" class="text-gray-600 text-sm leading-7 text-justify font-light">内容加载中...</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50/80 rounded-xl p-5 border border-gray-200/60 shadow-sm">
+                        <h3 class="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                            <span class="text-gray-400">🌑</span> 阴影模式
+                        </h3>
+                        <p id="result-shadow" class="text-gray-500 text-xs leading-6 text-justify">压力下的表现...</p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-gray-50/80 rounded-2xl p-4 text-center border border-gray-100">
-                        <p class="text-[10px] text-gray-400 uppercase tracking-wider mb-1">Soul Mate</p>
-                        <div class="text-2xl mb-1" id="result-match-icon">❤️</div>
-                        <p id="result-match" class="font-bold text-gray-700 text-sm">Matches</p>
+                <div class="mt-auto pt-6">
+                    <div class="w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent mb-6"></div>
+                    
+                    <div class="flex flex-col gap-3">
+                        <button onclick="location.reload()" class="w-full bg-slate-800 text-white py-4 rounded-2xl font-bold text-sm tracking-wide hover:bg-slate-900 shadow-lg shadow-slate-900/10 transition flex items-center justify-center gap-2 group">
+                            <svg class="w-4 h-4 text-slate-400 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                            重新测试
+                        </button>
+                        
+                        <button onclick="showPokedex()" class="w-full bg-slate-50 text-slate-500 py-3.5 rounded-2xl font-medium text-xs hover:bg-slate-100 hover:text-slate-800 transition">
+                            解锁全部 24 种人格图鉴
+                        </button>
                     </div>
-                    <div class="bg-gray-50/80 rounded-2xl p-4 text-center border border-gray-100">
-                        <p class="text-[10px] text-gray-400 uppercase tracking-wider mb-1">Conflict</p>
-                        <div class="text-2xl mb-1" id="result-enemy-icon">⚡</div>
-                        <p id="result-enemy" class="font-bold text-gray-700 text-sm">Enemies</p>
-                    </div>
-                </div>
-
-                <div class="pt-2 space-y-3">
-                    <button onclick="location.reload()" class="w-full bg-gray-900 text-white py-4 rounded-xl font-bold text-sm tracking-wide hover:bg-black shadow-lg transition">
-                        RESTART
-                    </button>
-                    <button onclick="showPokedex()" class="w-full text-gray-500 py-2 text-xs hover:text-gray-800 transition">
-                        查看完整图鉴
-                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="page-pokedex" class="hidden fixed inset-0 bg-gray-100/90 backdrop-blur-sm z-50 overflow-y-auto no-scrollbar">
+    <div id="page-pokedex" class="hidden fixed inset-0 bg-gray-100/95 backdrop-blur-sm z-50 overflow-y-auto no-scrollbar">
         <div class="max-w-md mx-auto min-h-screen bg-white shadow-2xl">
-            <div class="sticky top-0 bg-white/90 backdrop-blur-md p-5 border-b border-gray-100 flex items-center justify-between z-10">
+            <div class="sticky top-0 bg-white/95 backdrop-blur-md p-5 border-b border-gray-100 flex items-center justify-between z-10">
                 <div>
                     <h2 class="serif text-xl font-bold text-gray-900">图鉴</h2>
-                    <p class="text-[10px] text-gray-400 uppercase tracking-widest">Collection (24)</p>
+                    <p class="text-[10px] text-gray-400">已收录 24 种灵魂原型</p>
                 </div>
                 <button onclick="closePokedex()" class="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition">
                     <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
-            
-            <div class="p-5 grid grid-cols-1 gap-4" id="pokedex-grid">
-                </div>
+            <div class="p-5 grid grid-cols-1 gap-4" id="pokedex-grid"></div>
         </div>
     </div>
 
     <script>
         // --- 1. 24种动物完整数据 ---
-        // 注意：为了视觉效果，我在 color 字段使用了 Tailwind 的渐变类
-        // 并手动添加了 hex 颜色供雷达图使用
         const animals = {
-             // === 16种基础型 ===
+            // === 16种基础型 ===
             "snow_leopard": { // INTP
                 name: "雪豹", icon: "🐆",
                 slogan: "孤高的雪山哲人",
-                tags: ["独立", "极客", "边界感"],
-                color: "from-slate-700 to-slate-900", hex: "#334155",
-                desc: "栖息在雪线之上的哲人。你对世界的运行规律充满好奇，喜欢独自解构复杂问题。在社交中，你是话最少但看得最透的人。",
-                match: "赤狐", enemy: "金毛"
+                tags: ["独立", "逻辑怪", "极客"],
+                color: "from-slate-700 to-slate-900",
+                analysis: "你的思维宫殿精密而宏大。你就像栖息在雪线之上的雪豹，对世俗的热闹不感兴趣，却对世界运行的底层逻辑着迷。你拥有极强的抽象思维能力，善于解构复杂问题。在别人眼中你可能有些高冷或'不接地气'，但其实你只是在节省能量，专注于你认为真正重要的事情。",
+                social: "社交极简主义者。你不需要泛泛之交，更喜欢高质量的一对一深度对谈。在人群中你通常是观察者，但一旦遇到智力相当的对手，你会瞬间切换成滔滔不绝的辩论模式。",
+                energy: "独处是你最好的充电方式。解开一个谜题、钻研一项新技术、或者只是发呆思考，都能让你感到由衷的快乐。",
+                shadow: "当压力过大时，你可能会陷入'分析瘫痪'，过度纠结细节而无法行动；或者变得过分尖刻，用逻辑攻击他人的情感。"
             },
             "owl": { // INTJ
                 name: "仓鸮", icon: "🦉",
-                slogan: "暗夜的守望者",
-                tags: ["全知视角", "战略家", "高冷"],
-                color: "from-indigo-900 to-slate-900", hex: "#312e81",
-                desc: "智慧的化身。你崇尚逻辑和效率，对平庸零容忍。你在黑夜中保持绝对清醒，内心构建着宏大的战略蓝图。",
-                match: "海豚", enemy: "孔雀"
+                slogan: "暗夜的战略家",
+                tags: ["全知视角", "完美主义", "高冷"],
+                color: "from-indigo-900 to-slate-900",
+                analysis: "你是天生的战略家，总是站在上帝视角审视一切。你极其崇尚逻辑和效率，对平庸和低效零容忍。你像仓鸮一样，在黑夜中保持绝对清醒，内心构建着宏大的蓝图。你很难被情绪左右，这让你在危机中格外可靠，但也容易让人觉得难以亲近。",
+                social: "你对社交圈的筛选极其严格，'智性恋'倾向明显。你欣赏有深度、有能力的人，对于肤浅的闲聊感到厌烦。你不需要被理解，只需要被尊重。",
+                energy: "当你能够掌控局面，并按照自己的计划推进事物时，你会感到能量满满。知识的获取和系统的构建也是你的快乐源泉。",
+                shadow: "在极端压力下，你可能会变得傲慢、独断专行，甚至过度沉溺于感官享乐（如暴饮暴食）来逃避现实。"
             },
             "lion": { // ENTJ
                 name: "狮子", icon: "🦁",
                 slogan: "荣耀荒原的王者",
-                tags: ["霸气", "掌控欲", "目标感"],
-                color: "from-yellow-700 to-red-900", hex: "#b45309",
-                desc: "天生的主角。你拥有强大的气场和领导力，能在混乱中迅速建立秩序。虽然强势，但你极其护短。",
-                match: "林鹿", enemy: "水豚"
+                tags: ["天生领袖", "霸气", "目标感"],
+                color: "from-yellow-700 to-red-900",
+                analysis: "你天生就是主角。你拥有强大的气场和不容置疑的领导力，能够迅速在混乱中建立秩序。你野心勃勃，目光长远，对于目标有着绝对的执着。虽然有时显得强势，但你极其护短，能给跟随者带来巨大的安全感。你相信'成王败寇'，效率至上。",
+                social: "你是聚会的核心，擅长调动气氛和资源。你喜欢结交强者，社交对你来说往往也是一种资源置换或达成目标的手段。你直来直往，不喜欢弯弯绕绕。",
+                energy: "带领团队打赢胜仗、解决高难度挑战、获得公众的认可和掌声，这些都是你的高光时刻。",
+                shadow: "当事情失控时，你可能会变得暴躁、攻击性强，甚至为了赢而不择手段，忽略他人的感受。"
             },
             "fox": { // ENTP
                 name: "赤狐", icon: "🦊",
                 slogan: "狡黠的破局者",
-                tags: ["机智", "反骨", "创新"],
-                color: "from-orange-600 to-red-700", hex: "#ea580c",
-                desc: "规则的挑战者。你思维敏捷，喜欢用刁钻的角度看问题。你魅力十足，危险又迷人，永远没人能猜透你的下一张牌。",
-                match: "雪豹", enemy: "大象"
+                tags: ["脑洞大", "反骨", "机智"],
+                color: "from-orange-600 to-red-700",
+                analysis: "你是规则的挑战者。你思维敏捷，擅长从刁钻的角度看待问题。你讨厌一成不变，喜欢用恶作剧或激烈的辩论来测试底线。你魅力十足，危险又迷人，永远没人能猜透你的下一张牌。对你来说，世界就是一个巨大的游乐场。",
+                social: "你是社交场上的'搅局者'，擅长活跃气氛，也擅长制造话题。你喜欢和不同的人碰撞思想火花，但很难长期维持一段平淡的关系。",
+                energy: "头脑风暴、辩论、尝试新鲜事物、打破既定规则，这些都能让你感到兴奋不已。",
+                shadow: "压力大时，你可能会变得散漫、无法集中注意力，或者为了反驳而反驳，变成一个令人头疼的杠精。"
             },
             "whale": { // INFJ
                 name: "蓝鲸", icon: "🐋",
                 slogan: "深海的孤独神灵",
-                tags: ["灵性", "包容", "洞察力"],
-                color: "from-blue-900 to-indigo-900", hex: "#1e3a8a",
-                desc: "灵魂古老而深邃。你拥有惊人的直觉，能轻易洞察伪装。你看起来温柔，但内心有一片谁也无法抵达的净土。",
-                match: "赤狐", enemy: "孔雀"
+                tags: ["灵性", "洞察力", "深邃"],
+                color: "from-blue-900 to-indigo-900",
+                analysis: "你的灵魂古老而深邃。你拥有惊人的直觉，能轻易洞察他人的伪装和潜意识。你看起来温柔包容，但内心有一片谁也无法抵达的净土。你是一个理想主义者，终其一生都在寻找精神层面的终极共鸣。你对世界充满悲悯，但往往容易忽略自己。",
+                social: "你像变色龙一样能适应各种社交场合，但这非常消耗你的能量。你真正的朋友极少，但每一个都是灵魂伴侣级别的深度连接。",
+                energy: "帮助他人成长、进行深度的精神交流、或者独自沉浸在艺术和哲学中，能让你感到圆满。",
+                shadow: "当承受过多他人的负面情绪时，你会彻底封闭自己，切断所有联系（Door Slam）；或者变得过度挑剔和强迫。"
             },
             "deer": { // INFP
                 name: "林鹿", icon: "🦌",
                 slogan: "迷雾森林的诗人",
-                tags: ["敏感", "文艺", "治愈"],
-                color: "from-emerald-600 to-teal-800", hex: "#059669",
-                desc: "内心拥有一座秘密花园。你对情绪和美非常敏感。虽然不善言辞，但内心有着丰富的道德罗盘。",
-                match: "狮子", enemy: "黑鹰"
+                tags: ["治愈", "文艺", "敏感"],
+                color: "from-emerald-600 to-teal-800",
+                analysis: "你内心拥有一座精致的秘密花园。你非常敏感，不仅是对他人的情绪，也包括对美和艺术。你温柔而坚定，虽然不善言辞，但内心有着丰富的道德罗盘。你渴望被理解，又害怕被看穿。你用独特的滤镜观察世界，总能发现平凡中的诗意。",
+                social: "你比较慢热，在陌生环境中会显得害羞。但面对熟悉的人，你会展现出孩子气和幽默的一面。你倾向于避免冲突，是和平主义者。",
+                energy: "沉浸在幻想世界、创作（写作、绘画等）、阅读、在大自然中独处，是你的快乐源泉。",
+                shadow: "当理想破灭时，你容易陷入自我攻击和抑郁情绪，或者变得愤世嫉俗，觉得世界配不上你的纯真。"
             },
             "swan": { // ENFJ
                 name: "黑天鹅", icon: "🦢",
                 slogan: "优雅的精神领袖",
                 tags: ["魅力", "引导者", "感染力"],
-                color: "from-gray-700 to-black", hex: "#1f2937",
-                desc: "生来就是为了影响他人的。你不仅优雅，更有一种鼓舞人心的力量。你是团队的精神图腾。",
-                match: "林鹿", enemy: "雪豹"
+                color: "from-gray-700 to-black",
+                analysis: "你生来就是为了影响他人的。你不仅优雅，更有一种鼓舞人心的力量。你极其擅长发现别人的潜力，并愿意帮助他们成长。你是团队的精神图腾，只要有你在，大家就会感到有了方向。你对他人的情绪极其敏感，有时甚至会为了和谐而委屈自己。",
+                social: "你是天生的社交家，能够真诚地关心每一个人，让每个人都觉得被重视。但要注意，不要为了讨好所有人而失去了自我。",
+                energy: "组织活动、发表演讲、帮助朋友解决情感问题、看到团队凝聚在一起，会让你感到无比满足。",
+                shadow: "当你的付出得不到回报时，你会变得控制欲极强，或者通过情感操纵来获得关注。"
             },
             "dolphin": { // ENFP
                 name: "海豚", icon: "🐬",
                 slogan: "自由的弄潮儿",
-                tags: ["脑洞", "自由", "开心果"],
-                color: "from-cyan-500 to-blue-600", hex: "#06b6d4",
-                desc: "有趣的灵魂，脑洞比黑洞还大。常规是你最大的敌人，你一生都在追求新鲜感。你是天生的社交明星。",
-                match: "仓鸮", enemy: "黑鹰"
+                tags: ["开心果", "脑洞", "自由"],
+                color: "from-cyan-500 to-blue-600",
+                analysis: "你拥有无比有趣的灵魂，脑洞比黑洞还大。常规和教条是你最大的敌人，你的一生都在追求新鲜感和可能性的路上。你热情、乐观，总能看到事情好的一面。你像海豚一样，用声纳连接着每一个有趣的灵魂，是天生的社交明星。",
+                social: "你是人见人爱的'开心果'，哪里有你哪里就有欢笑。你对人充满好奇，很容易和陌生人打成一片，但有时也会因为承诺太多而难以兑现。",
+                energy: "探索未知的领域、开始一个新的项目、结识有趣的新朋友、进行一场说走就走的旅行。",
+                shadow: "当感到被束缚或无聊时，你会变得烦躁不安、无法专注，甚至通过放纵自己来逃避压力。"
             },
             "elephant": { // ISTJ
                 name: "大象", icon: "🐘",
                 slogan: "沉默的负重者",
                 tags: ["可靠", "稳重", "责任"],
-                color: "from-stone-500 to-stone-700", hex: "#57534e",
-                desc: "世间最坚实的依靠。你话不多，但每一句都算数。你的爱深沉而厚重，一旦认定，便是一生的守护。",
-                match: "孔雀", enemy: "赤狐"
+                color: "from-stone-500 to-stone-700",
+                analysis: "你是世间最坚实的依靠。你话不多，但每一句都算数。你尊重传统和规则，拥有惊人的记忆力和耐心。虽然你不善于表达情感，但你的爱深沉而厚重，一旦认定，便是一生的守护。你做事条理分明，是混乱世界中的稳定器。",
+                social: "你比较慢热，不喜欢浮夸的社交场合。你更看重长久、稳定的关系。在朋友眼中，你是那个永远都在、随叫随到的靠谱伙伴。",
+                energy: "把事情井井有条地完成、整理物品、独处、按照计划度过完美的一天。",
+                shadow: "当生活发生剧变时，你会变得极度焦虑、固执己见，甚至对周围的人吹毛求疵。"
             },
             "penguin": { // ISFJ
                 name: "企鹅", icon: "🐧",
                 slogan: "冰原的守护者",
                 tags: ["忠诚", "奉献", "坚韧"],
-                color: "from-sky-600 to-blue-800", hex: "#0284c7",
-                desc: "用体温温暖身边的人。你极其重视承诺，为了保护在乎的人可以忍受极端环境。你是维系群体最重要的基石。",
-                match: "黑鹰", enemy: "赤狐"
+                color: "from-sky-600 to-blue-800",
+                analysis: "在这个冷漠的世界里，你用体温温暖着身边的人。你极其重视关系和承诺，为了保护你在乎的人，你可以忍受极端的环境。你勤恳、细腻，虽然不起眼，但却是维系群体最重要的基石。你记性很好，记得所有人的生日和喜好。",
+                social: "你是最好的倾听者和照顾者。你总是默默付出，不求回报，但内心其实很渴望被认可和感谢。你很难拒绝别人的请求。",
+                energy: "照顾家人朋友、营造温馨的环境、帮助他人解决具体困难、获得他人的感谢。",
+                shadow: "当压力过大时，你会陷入受害者心态，抱怨虽然付出了很多却没人理解，或者变得悲观绝望。"
             },
             "eagle": { // ESTJ
                 name: "黑鹰", icon: "🦅",
                 slogan: "天空的秩序官",
                 tags: ["严厉", "高效", "执行"],
-                color: "from-neutral-700 to-black", hex: "#262626",
-                desc: "一切低效都逃不过你的眼睛。你信奉优胜劣汰，雷厉风行。你是秩序的维护者，也是最可靠的指挥官。",
-                match: "企鹅", enemy: "海豚"
+                color: "from-neutral-700 to-black",
+                analysis: "你盘旋在高空，一切低效和混乱都逃不过你的眼睛。你信奉优胜劣汰，行事雷厉风行。你可能被认为不够近人情，但你总能带领团队拿到结果。你是秩序的维护者，也是最可靠的指挥官。你相信事实胜于雄辩。",
+                social: "你喜欢和能干、直接的人打交道。你习惯在群体中占据主导地位，负责制定规则和分配任务。你对情绪化的表达不太感冒。",
+                energy: "高效地完成任务、建立秩序、管理团队、看到事情按照你的预期发展。",
+                shadow: "当权威受到挑战时，你会变得暴怒、独断，甚至试图控制一切细节，让人感到窒息。"
             },
             "golden_retriever": { // ESFJ
                 name: "金毛", icon: "🐕",
                 slogan: "治愈系的小太阳",
                 tags: ["社牛", "共情", "温暖"],
-                color: "from-amber-400 to-orange-500", hex: "#f59e0b",
-                desc: "朋友圈的粘合剂。你对情绪有雷达般的感知力，总把照顾别人放在第一位。你是大家公认的'最佳依靠'。",
-                match: "水豚", enemy: "雪豹"
+                color: "from-amber-400 to-orange-500",
+                analysis: "你是朋友圈里的粘合剂，哪里有你，哪里就有温暖。你对他人的情绪变化有着雷达般的感知力，总是把照顾别人的感受放在第一位。你忠诚、可靠，是大家公认的'最佳依靠'。你非常重视和谐，为了避免冲突愿意做很多妥协。",
+                social: "你是天生的'组局者'，热衷于八卦和分享生活。你害怕孤独，需要大量的陪伴和互动。你非常在意自己在别人眼中的形象。",
+                energy: "组织聚会、帮助朋友、收到礼物和赞美、感受到大家庭的温暖和谐。",
+                shadow: "当感到被排挤或忽视时，你会变得情绪化、控制欲强，或者通过卖惨来博取同情。"
             },
             "octopus": { // ISTP
                 name: "章鱼", icon: "🐙",
                 slogan: "深渊的技术流",
                 tags: ["多面手", "冷静", "独行"],
-                color: "from-violet-600 to-fuchsia-800", hex: "#7c3aed",
-                desc: "天生的问题解决专家。拥有极强的好奇心和动手能力。你冷静、高效，善于适应环境，但绝不依赖任何人。",
-                match: "金毛", enemy: "黑天鹅"
+                color: "from-violet-600 to-fuchsia-800",
+                analysis: "你是天生的问题解决专家。你拥有极强的好奇心和动手能力，在这个复杂的世界里，你总能找到捷径。你像章鱼一样拥有多核大脑，冷静、高效，善于适应环境，但绝不依赖任何人。你注重逻辑和实用，不喜欢空谈理论。",
+                social: "你话不多，但往往一针见血。你喜欢通过共同的兴趣活动（如运动、游戏）来交友，而不是通过情感交流。你需要大量的个人空间。",
+                energy: "拆解和组装东西、极限运动、解决危机、掌握一项新技能。",
+                shadow: "压力大时，你会变得愤世嫉俗、鲁莽冲动，或者完全切断情感，变成一个冷酷的机器。"
             },
             "capybara": { // ISFP
                 name: "水豚", icon: "🍊",
                 slogan: "佛系的入定大师",
                 tags: ["情绪稳定", "随缘", "和平"],
-                color: "from-green-500 to-emerald-700", hex: "#10b981",
-                desc: "精神状态极其美丽。拥有令人羡慕的'钝感力'，外界的焦虑很难干扰你。你是所有焦虑型人格的解药。",
-                match: "狮子", enemy: "黑鹰"
+                color: "from-green-500 to-emerald-700",
+                analysis: "精神状态极其美丽，天塌下来当被子盖。你拥有令人羡慕的'钝感力'，外界的焦虑和内卷很难干扰到你的节奏。你随遇而安，是所有焦虑型人格的天然解药。你有着独特的审美和艺术感知力，活在当下。",
+                social: "你从不强求融入任何圈子，但大家都很喜欢和你待在一起，因为你让人感到放松。你不会评判别人，接受一切差异。",
+                energy: "躺平、听音乐、撸猫、在舒适的环境中发呆、享受美食。",
+                shadow: "当被迫面对激烈的竞争或冲突时，你会选择逃避现实，或者变得极度被动、消极抵抗。"
             },
             "honey_badger": { // ESTP
                 name: "蜜獾", icon: "🦡",
                 slogan: "无畏的逆行者",
                 tags: ["硬刚", "行动派", "直率"],
-                color: "from-orange-700 to-red-800", hex: "#c2410c",
-                desc: "生死看淡，不服就干。你最讨厌虚伪，拥有极强的抗压能力。你活在当下，享受挑战，是天生的战士。",
-                match: "水豚", enemy: "林鹿"
+                color: "from-orange-700 to-red-800",
+                analysis: "平头哥，生死看淡，不服就干。你最讨厌虚伪和弯弯绕绕，有话直说。你拥有极强的生命力和抗压能力，逆境只会让你更兴奋。你活在当下，享受挑战，是天生的战士。你行动力极强，通常是先做再说。",
+                social: "你是社交场上的'带头大哥'，喜欢热闹和刺激。你说话直率，有时会不小心得罪人，但大家由于你的真诚和义气往往会原谅你。",
+                energy: "冒险、竞技运动、解决紧急危机、成为焦点、即时行乐。",
+                shadow: "当感到无聊或受挫时，你会变得冲动、鲁莽，甚至通过破坏性的行为来寻找刺激。"
             },
             "peacock": { // ESFP
                 name: "孔雀", icon: "🦚",
                 slogan: "盛夏的狂欢者",
                 tags: ["焦点", "乐天", "闪耀"],
-                color: "from-pink-500 to-rose-600", hex: "#ec4899",
-                desc: "生来就该在聚光灯下。你的存在就是一场演出。虽然有人觉得你浮夸，但你的快乐真实且具感染力。",
-                match: "大象", enemy: "仓鸮"
+                color: "from-pink-500 to-rose-600",
+                analysis: "生来就该站在聚光灯下。你热爱生活，热爱展示，你的存在本身就是一场盛大的演出。你讨厌沉闷和孤独，能瞬间点燃气氛。虽然有人觉得你浮夸，但你的快乐是真实的，且极具感染力。你是体验派，要在有限的生命里活出无限的精彩。",
+                social: "你是派对之王，没有人能拒绝你的热情。你喜欢被关注和赞美，对他人的情绪变化也很敏感。你对待朋友非常大方。",
+                energy: "表演、聚会、购物、旅行、让周围的人开心大笑。",
+                shadow: "当失去关注或独处时，你会感到深深的空虚和焦虑，或者变得冲动消费、过度放纵。"
             },
 
-            // === 8种特殊/平衡型 ===
+            // === 8种特殊/平衡型 (深度补充) ===
             "maine_coon": { // E/I平衡
                 name: "缅因猫", icon: "🐱",
                 slogan: "温柔的巨人绅士",
-                tags: ["间歇社恐", "外冷内热", "粘人"],
-                color: "from-stone-500 to-orange-400", hex: "#78716c",
-                desc: "矛盾的综合体。拥有猫的独立与狗的忠诚。你在社交中游刃有余，但内心始终保留着一个谁也进不去的角落。",
-                match: "金毛", enemy: "黑鹰"
+                tags: ["间歇社恐", "外冷内热", "独立"],
+                color: "from-stone-500 to-orange-400",
+                analysis: "你是一个矛盾的综合体。你拥有猫的独立与高傲，却又在某些时刻展现出狗一般的忠诚与粘人。你在社交中游刃有余，但内心始终保留着一个谁也进不去的角落。你既不完全内向也不完全外向，你只是选择性地对特定的人敞开。",
+                social: "在陌生人面前高冷，在熟人面前疯癫。你不需要很多朋友，但你的朋友都很依赖你。",
+                energy: "在舒适的家中招待三两好友、被喜欢的人抚摸顺毛、独自掌控全场的感觉。",
+                shadow: "压力大时会突然消失，不回消息，切断联系，躲在自己的安全屋里。"
             },
             "chameleon": { // E/I平衡
                 name: "变色龙", icon: "🦎",
                 slogan: "全能的社交黑客",
-                tags: ["适应力", "伪装", "多面"],
-                color: "from-lime-500 to-green-600", hex: "#84cc16",
-                desc: "天生的外交官。你可以无缝融入任何圈子，但很少有人能看透你真实的底色。这种能力让你安全，也让你迷失。",
-                match: "虎鲸", enemy: "鳄鱼"
+                tags: ["适应力", "伪装", "观察者"],
+                color: "from-lime-500 to-green-600",
+                analysis: "你是天生的演员和外交官。你可以无缝融入任何圈子，和任何人谈笑风生，但很少有人能看透你真实的底色。你的E和I属性随时切换，这取决于你面对的是谁。这种能力让你极其安全，但也时常让你感到迷失：到底哪个才是真实的我？",
+                social: "你可以和任何人聊得来，是极好的倾听者和捧哏。你擅长读空气，总能做出最得体的反应。",
+                energy: "观察人类行为、在不同圈子间游走、成功隐藏自己的真实意图。",
+                shadow: "因为过度迎合他人而感到精疲力尽，或者因为缺乏坚定的立场而被认为是'墙头草'。"
             },
             "orca": { // T/F平衡 (外向)
                 name: "虎鲸", icon: "🦈",
                 slogan: "深情的深海霸主",
                 tags: ["高智商", "家族", "护短"],
-                color: "from-slate-800 to-black", hex: "#0f172a",
-                desc: "理智与情感的完美结合。对外展现猎手的冷酷逻辑，对内有着深情的纽带。聪明、强壮且记仇。",
-                match: "海豚", enemy: "大象"
+                color: "from-slate-800 to-black",
+                analysis: "你是理智与情感的完美结合体。对待外人，你展现出顶级猎手的冷酷逻辑和策略；但对待自己人，你有着甚至超越人类的深情纽带。你聪明、强壮且记仇，千万别惹你，也别惹你爱的人。你既能在大局上杀伐决断，又能照顾到团队的情绪。",
+                social: "你是团队中的核心人物，既能做决策也能搞团建。你很护短，你的朋友只有你能欺负。",
+                energy: "带领团队取得胜利、保护家人朋友、策划复杂的行动。",
+                shadow: "可能会因为过度保护而变得控制欲强，或者在报复敌人时过于残忍。"
             },
             "sea_turtle": { // T/F平衡 (内向)
                 name: "海龟", icon: "🐢",
                 slogan: "沉默的远航智者",
                 tags: ["慢热", "智慧", "长情"],
-                color: "from-teal-600 to-cyan-800", hex: "#0d9488",
-                desc: "坚硬的理性外壳，柔软感性的内心。你活在自己的时区里。你相信时间的力量，追求长久的陪伴。",
-                match: "蓝鲸", enemy: "蜜獾"
+                color: "from-teal-600 to-cyan-800",
+                analysis: "你拥有坚硬的理性外壳，保护着柔软感性的内心。你活在自己的时区里，不慌不忙。外界的喧嚣很难打扰到你，你用一种近乎哲学的态度看待得失。你相信时间的力量，无论是事业还是感情，你都追求长久的陪伴。你是大智若愚的典型。",
+                social: "非常慢热，需要很久才能走进你的内心。但一旦进入，你就是最忠诚的伙伴。",
+                energy: "独处思考、长途旅行、看着事情慢慢变好、沉浸在爱好中。",
+                shadow: "由于反应较慢或过于退让，容易错失机会，或者习惯性地忍受不公。"
             },
             "squirrel": { // J/P平衡
                 name: "松鼠", icon: "🐿️",
                 slogan: "敏捷的收藏家",
                 tags: ["未雨绸缪", "焦虑", "灵活"],
-                color: "from-amber-600 to-orange-700", hex: "#d97706",
-                desc: "内心处于'秩序'与'混乱'的叠加态。你喜欢囤积物资对抗不安全感。你是乱世中的生存专家。",
-                match: "考拉", enemy: "狮子"
+                color: "from-amber-600 to-orange-700",
+                analysis: "你看起来总是很忙碌，很有计划，但你的内心其实经常处于'秩序'与'混乱'的叠加态。你喜欢收集信息、囤积物资来对抗不安全感。你反应极快，能够在计划被打乱时瞬间找到新出路，是乱世中的生存专家。",
+                social: "你很机灵，消息灵通，是朋友圈里的'包打听'。你总是风风火火的。",
+                energy: "整理收藏品、找到高性价比的东西、解决突发的小麻烦。",
+                shadow: "容易陷入过度焦虑，囤积很多没用的东西，或者因为想做的事太多而一事无成。"
             },
             "koala": { // S/N平衡
                 name: "考拉", icon: "🐨",
                 slogan: "清醒的入世隐士",
                 tags: ["佛系", "旁观", "挑剔"],
-                color: "from-gray-400 to-slate-500", hex: "#94a3b8",
-                desc: "看起来懒洋洋，其实是在筛选世界。只有让你感到绝对舒适的人事物，你才会紧抱不放。你活得清醒通透。",
-                match: "松鼠", enemy: "鳄鱼"
+                color: "from-gray-400 to-slate-500",
+                analysis: "你看起来懒洋洋的，对什么都无所谓，但这其实是你筛选世界的方式。你对环境和人其实非常挑剔，只有让你感到绝对舒适的人事物，你才会紧抱不放。你活得清醒而通透，拒绝参与任何无意义的内卷。你懂得如何用最少的力气活得最舒服。",
+                social: "你不想认识新朋友，只想和老朋友挂在一起。由于太懒，你甚至懒得生气。",
+                energy: "睡觉、发呆、吃好吃的、被照顾。",
+                shadow: "可能会变得过于冷漠和懒散，对他人的痛苦无动于衷，逃避所有责任。"
             },
             "unicorn": { // 极端NF
                 name: "独角兽", icon: "🦄",
                 slogan: "纯粹的幻想生物",
                 tags: ["极致理想", "纯洁", "高维"],
-                color: "from-fuchsia-300 to-purple-400", hex: "#d8b4fe",
-                desc: "纯粹得不像凡间产物。你是极致的理想主义者，对美和正义有洁癖般的追求。你的存在本身就是一种净化。",
-                match: "雪豹", enemy: "鳄鱼"
+                color: "from-fuchsia-300 to-purple-400",
+                analysis: "你的灵魂纯粹得不像这个世界的产物。你是一个极致的理想主义者，对美、爱和正义有着近乎洁癖的追求。你在人群中显得格格不入，因为你总是试图在凡间寻找天堂。你的存在本身，就是对他人的净化。你拥有治愈人心的魔法。",
+                social: "你寻找的是灵魂伴侣，对于世俗的社交感到疲惫。你很容易吸引受伤的人。",
+                energy: "做梦、创作、帮助弱小、感受到神圣的连接。",
+                shadow: "极度脆弱，容易被现实的残酷击碎。可能会因为无法忍受世界的瑕疵而选择彻底避世。"
             },
             "crocodile": { // 极端ST
                 name: "鳄鱼", icon: "🐊",
                 slogan: "冷酷的生存机器",
                 tags: ["现实", "耐心", "强者"],
-                color: "from-green-800 to-stone-800", hex: "#3f6212",
-                desc: "绝对的现实主义者。没有多余情绪，只关注结果。你拥有可怕的耐心，是食物链顶端的强者。",
-                match: "变色龙", enemy: "独角兽"
+                color: "from-green-800 to-stone-800",
+                analysis: "你是绝对的现实主义者。你没有多余的情绪，只关注结果和生存。你拥有可怕的耐心，可以潜伏很久只为等待一个机会。在弱肉强食的世界里，你是站在食物链顶端的强者，你的眼泪从来不是为了悲伤。你强大、冷静、令人敬畏。",
+                social: "你不需要朋友，只需要盟友或猎物。你的社交是基于利益交换的。",
+                energy: "狩猎成功、掌控局势、看着对手失败。",
+                shadow: "变得冷血无情，为了利益可以牺牲一切，包括亲密关系。"
             }
         };
 
-        // --- 2. 逻辑控制 ---
+        // --- 逻辑控制 ---
         let currentQuestionIndex = 0;
         let scores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
         let historyStack = [];
@@ -482,14 +545,14 @@
         }
 
         function backToHome() {
-            if(confirm("确定退出？进度将丢失")) showPage('page-landing');
+            if(confirm("确定要退出吗？当前进度将丢失。")) showPage('page-landing');
         }
 
         function renderQuestion() {
             const q = currentQuestions[currentQuestionIndex];
             const progress = ((currentQuestionIndex) / currentQuestions.length) * 100;
             document.getElementById('progress-bar').style.width = `${progress}%`;
-            document.getElementById('quiz-progress-text').innerText = `QUESTION ${String(currentQuestionIndex + 1).padStart(2, '0')}`;
+            document.getElementById('quiz-progress-text').innerText = `第 ${String(currentQuestionIndex + 1).padStart(2, '0')} 题`;
             document.getElementById('question-text').innerText = q.q;
 
             const container = document.getElementById('options-container');
@@ -531,7 +594,7 @@
 
         function finishQuiz() {
             showPage('page-loading');
-            const loadingTexts = ["整合思维碎片...", "分析社交磁场...", "匹配灵魂原型...", "生成最终报告..."];
+            const loadingTexts = ["整合思维碎片...", "分析社交磁场...", "绘制灵魂原型...", "生成最终报告..."];
             let step = 0;
             const interval = setInterval(() => {
                 if (step < loadingTexts.length) {
@@ -542,7 +605,6 @@
             setTimeout(() => { clearInterval(interval); calculateResult(); }, 2500);
         }
 
-        // --- 3. 算法 ---
         function calculateResult() {
             const s = scores;
             const dim1 = s.E >= s.I ? 'E' : 'I';
@@ -581,80 +643,25 @@
             showPage('page-result');
         }
 
-        // --- 4. 渲染 (海报风格) ---
         function renderResultPage(key) {
             const data = animals[key];
             
-            // 文本和图标填充
             document.getElementById('result-animal').innerText = data.name;
             document.getElementById('result-icon').innerText = data.icon;
             document.getElementById('result-slogan').innerText = data.slogan;
-            document.getElementById('result-desc').innerText = data.desc;
-
-            // 匹配对象
-            const matchData = animals[data.match] || {name: data.match, icon: '❤️'};
-            const enemyData = animals[data.enemy] || {name: data.enemy, icon: '⚡'};
             
-            document.getElementById('result-match').innerText = matchData.name;
-            document.getElementById('result-match-icon').innerText = matchData.icon;
-            
-            document.getElementById('result-enemy').innerText = enemyData.name;
-            document.getElementById('result-enemy-icon').innerText = enemyData.icon;
+            document.getElementById('result-analysis').innerText = data.analysis;
+            document.getElementById('result-social').innerText = data.social;
+            document.getElementById('result-energy').innerText = data.energy;
+            document.getElementById('result-shadow').innerText = data.shadow;
 
-            // 海报背景色 (应用到整个卡片)
             const bg = document.getElementById('poster-bg');
             bg.className = `absolute inset-0 bg-gradient-to-b ${data.color} transition-colors duration-700`;
 
-            // Tags
             const tagsContainer = document.getElementById('result-tags');
             tagsContainer.innerHTML = data.tags.map(t => 
                 `<span class="px-3 py-1 bg-white/20 backdrop-blur-md border border-white/20 rounded-full text-[10px] text-white font-bold tracking-widest uppercase">${t}</span>`
             ).join('');
-
-            renderRadarChart(data.hex);
-        }
-
-        let radarChartInstance = null;
-        function renderRadarChart(colorHex) {
-            const ctx = document.getElementById('radarChart').getContext('2d');
-            const normalize = (val) => Math.min((val / 10) * 100, 100);
-            const dataValues = [
-                normalize(scores.E), normalize(scores.F), normalize(scores.N), normalize(scores.T), normalize(scores.J)
-            ];
-
-            if (radarChartInstance) radarChartInstance.destroy();
-
-            // 动态调整雷达图颜色适配动物
-            const mainColor = colorHex || '#4b5563';
-
-            radarChartInstance = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: ['社交', '共情', '想象', '逻辑', '执行'],
-                    datasets: [{
-                        data: dataValues,
-                        backgroundColor: mainColor + '33', // 20% opacity
-                        borderColor: mainColor,
-                        borderWidth: 2,
-                        pointBackgroundColor: mainColor,
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: mainColor
-                    }]
-                },
-                options: {
-                    scales: {
-                        r: {
-                            angleLines: { color: 'rgba(0,0,0,0.05)' },
-                            grid: { color: 'rgba(0,0,0,0.05)' },
-                            pointLabels: { font: { size: 10, family: "'Noto Sans SC'" }, color: '#9ca3af' },
-                            suggestedMin: 0, suggestedMax: 100, ticks: { display: false }
-                        }
-                    },
-                    plugins: { legend: { display: false } },
-                    maintainAspectRatio: false
-                }
-            });
         }
 
         function showPokedex() {
