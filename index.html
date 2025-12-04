@@ -232,7 +232,7 @@
                         </button>
                         
                         <button onclick="showPokedex()" class="w-full bg-slate-50 text-slate-500 py-3.5 rounded-2xl font-medium text-xs hover:bg-slate-100 hover:text-slate-800 transition">
-                            解锁全部 24 种人格图鉴
+                            查看全部 24 种人格图鉴
                         </button>
                     </div>
                 </div>
@@ -664,6 +664,7 @@
             ).join('');
         }
 
+        // 修改后的 showPokedex 函数
         function showPokedex() {
             const grid = document.getElementById('pokedex-grid');
             grid.innerHTML = '';
@@ -671,7 +672,12 @@
             Object.keys(animals).forEach(key => {
                 const a = animals[key];
                 const card = document.createElement('div');
-                card.className = "bg-white rounded-2xl p-4 border border-gray-100 flex gap-4 items-center hover:shadow-lg transition cursor-default";
+                // 修改了class，增加了 cursor-pointer 和 hover/active 效果
+                card.className = "bg-white rounded-2xl p-4 border border-gray-100 flex gap-4 items-center hover:shadow-lg transition cursor-pointer transform hover:scale-[1.02] active:scale-95";
+                
+                // 绑定点击事件
+                card.onclick = () => viewResultFromPokedex(key);
+
                 card.innerHTML = `
                     <div class="w-14 h-14 rounded-2xl bg-gradient-to-br ${a.color} flex items-center justify-center text-2xl shadow-md shrink-0 text-white">
                         ${a.icon}
@@ -689,6 +695,13 @@
                 grid.appendChild(card);
             });
             document.getElementById('page-pokedex').classList.remove('hidden');
+        }
+
+        // 新增：从图鉴点击查看结果的辅助函数
+        function viewResultFromPokedex(key) {
+            closePokedex();
+            renderResultPage(key);
+            showPage('page-result');
         }
 
         function closePokedex() {
