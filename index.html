@@ -27,6 +27,13 @@
             overflow-x: hidden;
         }
         .serif { font-family: 'Noto Serif SC', serif; }
+        
+        /* --- 修改点 1: 定义黑体样式 --- */
+        .font-heiti { 
+            font-family: "SimHei", "Heiti SC", "STHeiti", "Microsoft YaHei", sans-serif; 
+            font-weight: 700; /* 确保黑体足够粗 */
+        }
+
         .fade-in { animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
@@ -158,7 +165,9 @@
         </div>
         <div class="flex-1 flex flex-col fade-in">
             <span class="text-xs font-bold text-gray-300 tracking-widest mb-4 block" id="quiz-progress-text">第 01 题</span>
-            <h2 id="question-text" class="text-xl serif font-bold text-gray-800 mb-10 leading-relaxed">题目加载中...</h2>
+            
+            <h2 id="question-text" class="text-xl font-heiti text-gray-800 mb-10 leading-relaxed">题目加载中...</h2>
+            
             <div id="options-container" class="space-y-3"></div>
         </div>
         <div class="mt-8 flex justify-between items-center opacity-0 transition-opacity" id="quiz-controls">
@@ -374,7 +383,7 @@
                 slogan: "治愈系的小太阳",
                 tags: ["社牛", "共情", "温暖"],
                 color: "from-amber-400 to-orange-500",
-                analysis: "你是朋友圈里的粘合剂，哪里有你，哪里就有温暖。你对他人的情绪变化有着雷达般的感知力，总是把照顾别人的感受放在第一位。你忠诚、可靠，是大家公认的'最佳依靠'。你非常重视和谐，为了避免冲突愿意做很多妥协。",
+                analysis: "你是朋友圈里的粘合剂，哪里有你，哪里就有温暖。你对他人的情绪变化也很敏感，总是把照顾别人的感受放在第一位。你忠诚、可靠，是大家公认的'最佳依靠'。你非常重视和谐，为了避免冲突愿意做很多妥协。",
                 social: "你是天生的'组局者'，热衷于八卦和分享生活。你害怕孤独，需要大量的陪伴和互动。你非常在意自己在别人眼中的形象。",
                 energy: "组织聚会、帮助朋友、收到礼物和赞美、感受到大家庭的温暖和谐。",
                 shadow: "当感到被排挤或忽视时，你会变得情绪化、控制欲强，或者通过卖惨来博取同情。"
@@ -558,10 +567,17 @@
             const container = document.getElementById('options-container');
             container.innerHTML = '';
             
+            // --- 修改点 3: 自动添加 ABCD 选项前缀 ---
+            const labels = ['A', 'B', 'C', 'D', 'E', 'F']; 
+            
             q.options.forEach((opt, index) => {
                 const btn = document.createElement('button');
                 btn.className = "option-btn w-full text-left p-5 rounded-2xl border-2 border-gray-100 hover:border-gray-900 hover:bg-gray-50 transition duration-200 text-gray-700 text-sm font-medium leading-relaxed mb-3";
-                btn.innerText = opt.t;
+                
+                // 这里将选项文字前加上 "A. " 等前缀
+                const label = labels[index] || (index + 1);
+                btn.innerText = `${label}. ${opt.t}`;
+                
                 btn.onclick = () => handleAnswer(opt.s);
                 btn.style.animation = `fadeIn 0.5s ease forwards ${index * 0.1}s`;
                 btn.style.opacity = '0';
@@ -664,7 +680,6 @@
             ).join('');
         }
 
-        // 修改后的 showPokedex 函数
         function showPokedex() {
             const grid = document.getElementById('pokedex-grid');
             grid.innerHTML = '';
@@ -672,10 +687,8 @@
             Object.keys(animals).forEach(key => {
                 const a = animals[key];
                 const card = document.createElement('div');
-                // 修改了class，增加了 cursor-pointer 和 hover/active 效果
                 card.className = "bg-white rounded-2xl p-4 border border-gray-100 flex gap-4 items-center hover:shadow-lg transition cursor-pointer transform hover:scale-[1.02] active:scale-95";
                 
-                // 绑定点击事件
                 card.onclick = () => viewResultFromPokedex(key);
 
                 card.innerHTML = `
@@ -697,7 +710,6 @@
             document.getElementById('page-pokedex').classList.remove('hidden');
         }
 
-        // 新增：从图鉴点击查看结果的辅助函数
         function viewResultFromPokedex(key) {
             closePokedex();
             renderResultPage(key);
