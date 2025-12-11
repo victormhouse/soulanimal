@@ -20,7 +20,6 @@
     <style>
         body {
             font-family: 'Noto Sans SC', sans-serif;
-            /* 修改1：背景色更丰富，从原来的冷灰蓝改为微暖的蓝紫渐变 */
             background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%); 
             color: #1e293b;
             -webkit-font-smoothing: antialiased;
@@ -53,9 +52,9 @@
         }
 
         .page-container {
-            background: rgba(255, 255, 255, 0.90); /* 稍微降低一点透明度，让背景色透一点出来 */
+            background: rgba(255, 255, 255, 0.90);
             backdrop-filter: blur(20px);
-            box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.15); /* 阴影带一点紫色 */
+            box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.6);
         }
 
@@ -116,18 +115,17 @@
             display: inline-block;
             width: 4px;
             height: 14px;
-            background-color: #6366f1; /* 标题前缀改成靛蓝色 */
+            background-color: #6366f1;
             border-radius: 2px;
             margin-right: 8px;
             vertical-align: middle;
             transform: translateY(-1px);
         }
         
-        /* 修改2：动物图标不再全灰，而是半透明彩色，悬停时完全鲜艳 */
         .animal-bg-icon {
-            font-size: 1.8rem; /* 稍微加大一点 */
-            opacity: 0.7;      /* 默认有70%透明度 */
-            filter: grayscale(0.2); /* 只有轻微的灰度 */
+            font-size: 1.8rem;
+            opacity: 0.7;
+            filter: grayscale(0.2);
             transition: all 0.5s;
             cursor: default;
         }
@@ -153,11 +151,11 @@
         <div class="mt-6 mb-8 relative z-10 flex flex-col items-center">
             <div class="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-full border border-indigo-100 tracking-wider uppercase mb-5 shadow-sm">
                 <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
-                Psychological Archetype System v2.0
+                心理原型分析系统 v2.0
             </div>
             
             <h1 class="text-3xl font-heiti font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600 mb-2 tracking-tight drop-shadow-sm">动物塑 · 人格原型测评</h1>
-            <p class="text-slate-500 text-xs tracking-widest uppercase font-medium">Animal Archetype Analysis</p>
+            <p class="text-slate-500 text-xs tracking-widest font-medium">深度心理学与社会生物学模型</p>
         </div>
 
         <div class="marquee-container w-full overflow-hidden mb-8 relative py-5 bg-white/40 rounded-2xl border border-white/50 shadow-inner">
@@ -191,15 +189,15 @@
 
         <div class="grid grid-cols-3 gap-2 mb-8">
             <div class="bg-indigo-50/50 border border-indigo-100 rounded-lg py-2 flex flex-col items-center justify-center">
-                <span class="text-[10px] text-indigo-400 uppercase">Model</span>
-                <span class="text-xs font-bold text-indigo-700">24种原型</span>
+                <span class="text-[10px] text-indigo-400">MODEL</span>
+                <span class="text-xs font-bold text-indigo-700">核心模型</span>
             </div>
             <div class="bg-purple-50/50 border border-purple-100 rounded-lg py-2 flex flex-col items-center justify-center">
-                <span class="text-[10px] text-purple-400 uppercase">Defense</span>
+                <span class="text-[10px] text-purple-400">DEFENSE</span>
                 <span class="text-xs font-bold text-purple-700">防御机制</span>
             </div>
             <div class="bg-blue-50/50 border border-blue-100 rounded-lg py-2 flex flex-col items-center justify-center">
-                <span class="text-[10px] text-blue-400 uppercase">Analysis</span>
+                <span class="text-[10px] text-blue-400">ANALYSIS</span>
                 <span class="text-xs font-bold text-blue-700">深度侧写</span>
             </div>
         </div>
@@ -218,7 +216,7 @@
                 </button>
             </div>
             <button onclick="showPokedex()" class="w-full text-slate-400 text-[10px] py-2 hover:text-indigo-500 transition flex items-center justify-center gap-1 tracking-wide">
-                浏览样本库 (ARCHIVE)
+                浏览完整图鉴 (ARCHIVE)
             </button>
         </div>
     </div>
@@ -228,13 +226,13 @@
             <div id="progress-bar" class="h-full bg-gradient-to-r from-indigo-500 to-purple-600 w-0 progress-bar-fill"></div>
         </div>
         <div class="flex-1 flex flex-col fade-in">
-            <span class="text-xs font-bold text-indigo-400 tracking-widest mb-4 block" id="quiz-progress-text">QUESTION 01</span>
+            <span class="text-xs font-bold text-indigo-400 tracking-widest mb-4 block" id="quiz-progress-text">第 01 题</span>
             <h2 id="question-text" class="text-xl font-heiti text-slate-800 mb-10 leading-relaxed font-bold">题目加载中...</h2>
             <div id="options-container" class="space-y-3"></div>
         </div>
         <div class="mt-8 flex justify-between items-center opacity-0 transition-opacity" id="quiz-controls">
-            <button onclick="prevQuestion()" class="text-slate-400 hover:text-slate-800 text-xs font-bold tracking-wider flex items-center gap-2 px-2 py-2">← BACK</button>
-            <button onclick="backToHome()" class="text-slate-300 hover:text-red-400 text-xs">ABORT</button>
+            <button onclick="prevQuestion()" class="text-slate-400 hover:text-slate-800 text-xs font-bold tracking-wider flex items-center gap-2 px-2 py-2">← 上一题</button>
+            <button onclick="backToHome()" class="text-slate-300 hover:text-red-400 text-xs">退出测试</button>
         </div>
     </div>
 
@@ -245,7 +243,7 @@
             <div class="absolute inset-0 flex items-center justify-center text-2xl animate-pulse">✨</div>
         </div>
         <h3 class="font-heiti text-lg text-indigo-900 mb-2 font-bold">正在计算人格矩阵</h3>
-        <p id="loading-text" class="text-xs text-indigo-400 tracking-widest font-mono">INITIALIZING...</p>
+        <p id="loading-text" class="text-xs text-indigo-400 tracking-widest font-mono">系统正在初始化...</p>
     </div>
 
     <div id="page-result" class="hidden w-full max-w-md rounded-[2rem] overflow-hidden poster-card fade-in relative min-h-[700px]">
@@ -259,7 +257,7 @@
                 <div class="mb-4 animate-[bounce_3s_infinite]">
                     <span id="result-icon" class="text-7xl drop-shadow-2xl filter">✨</span>
                 </div>
-                <div class="inline-block px-3 py-1 border border-white/30 rounded-full text-[10px] tracking-widest mb-3 bg-white/10 backdrop-blur-sm uppercase">Archetype Identifier</div>
+                <div class="inline-block px-3 py-1 border border-white/30 rounded-full text-[10px] tracking-widest mb-3 bg-white/10 backdrop-blur-sm uppercase">人格原型识别结果</div>
                 <h1 id="result-animal" class="text-4xl font-bold font-heiti mb-2 drop-shadow-md tracking-wider">动物名</h1>
                 <p id="result-slogan" class="text-sm font-light tracking-widest opacity-90">Slogan</p>
                 
@@ -271,17 +269,17 @@
                 
                 <div class="space-y-8">
                     <div>
-                        <h3 class="section-title">人格侧写 (Profile)</h3>
+                        <h3 class="section-title">人格侧写</h3>
                         <p id="result-analysis" class="text-gray-600 text-sm leading-7 text-justify font-light">分析加载中...</p>
                     </div>
 
                     <div class="grid grid-cols-1 gap-8">
                         <div>
-                            <h3 class="section-title">社交本能 (Social)</h3>
+                            <h3 class="section-title">社交本能</h3>
                             <p id="result-social" class="text-gray-600 text-sm leading-7 text-justify font-light">内容加载中...</p>
                         </div>
                         <div>
-                            <h3 class="section-title">能量机制 (Energy)</h3>
+                            <h3 class="section-title">能量机制</h3>
                             <p id="result-energy" class="text-gray-600 text-sm leading-7 text-justify font-light">内容加载中...</p>
                         </div>
                     </div>
@@ -302,9 +300,8 @@
                             <svg class="w-4 h-4 text-slate-400 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                             重新测评
                         </button>
-                        
                         <button onclick="showPokedex()" class="w-full bg-slate-50 text-slate-500 py-3.5 rounded-xl font-medium text-xs hover:bg-slate-100 hover:text-slate-800 transition">
-                            查看全图鉴 (DATA ARCHIVE)
+                            查看全图鉴
                         </button>
                     </div>
                 </div>
@@ -317,7 +314,7 @@
             <div class="sticky top-0 bg-white/95 backdrop-blur-md p-5 border-b border-gray-100 flex items-center justify-between z-10">
                 <div>
                     <h2 class="font-heiti text-lg font-bold text-gray-900">动物塑图鉴</h2>
-                    <p class="text-[10px] text-gray-400 font-mono">ARCHIVE: 24 ARCHETYPES FOUND</p>
+                    <p class="text-[10px] text-gray-400 font-mono">档案库：已收录 24 种原型</p>
                 </div>
                 <button onclick="closePokedex()" class="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition">
                     <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -330,6 +327,8 @@
     <script>
         // --- 1. 24种动物完整数据 (保持不变) ---
         const animals = {
+            // ... (与之前相同的数据，此处节省篇幅，实际使用时请保留完整数据) ...
+            // 为了代码完整性，请确保这里包含上一轮回复中的完整 animals 对象内容
             // === 16种基础型 ===
             "snow_leopard": { // INTP
                 name: "雪豹", icon: "🐆",
@@ -491,9 +490,7 @@
                 energy: "表演、聚会、购物、旅行、让周围的人开心大笑。",
                 shadow: "当失去关注或独处时，你会感到深深的空虚和焦虑，或者变得冲动消费、过度放纵。"
             },
-
-            // === 8种特殊/平衡型 (深度补充) ===
-            "maine_coon": { // E/I平衡
+            "maine_coon": { 
                 name: "缅因猫", icon: "🐱",
                 slogan: "温柔的巨人绅士",
                 tags: ["间歇社恐", "外冷内热", "独立"],
@@ -503,7 +500,7 @@
                 energy: "在舒适的家中招待三两好友、被喜欢的人抚摸顺毛、独自掌控全场的感觉。",
                 shadow: "压力大时会突然消失，不回消息，切断联系，躲在自己的安全屋里。"
             },
-            "chameleon": { // E/I平衡
+            "chameleon": { 
                 name: "变色龙", icon: "🦎",
                 slogan: "全能的社交黑客",
                 tags: ["适应力", "伪装", "观察者"],
@@ -513,7 +510,7 @@
                 energy: "观察人类行为、在不同圈子间游走、成功隐藏自己的真实意图。",
                 shadow: "因为过度迎合他人而感到精疲力尽，或者因为缺乏坚定的立场而被认为是'墙头草'。"
             },
-            "orca": { // T/F平衡 (外向)
+            "orca": { 
                 name: "虎鲸", icon: "🦈",
                 slogan: "深情的深海霸主",
                 tags: ["高智商", "家族", "护短"],
@@ -523,7 +520,7 @@
                 energy: "带领团队取得胜利、保护家人朋友、策划复杂的行动。",
                 shadow: "可能会因为过度保护而变得控制欲强，或者在报复敌人时过于残忍。"
             },
-            "sea_turtle": { // T/F平衡 (内向)
+            "sea_turtle": { 
                 name: "海龟", icon: "🐢",
                 slogan: "沉默的远航智者",
                 tags: ["慢热", "智慧", "长情"],
@@ -533,7 +530,7 @@
                 energy: "独处思考、长途旅行、看着事情慢慢变好、沉浸在爱好中。",
                 shadow: "由于反应较慢或过于退让，容易错失机会，或者习惯性地忍受不公。"
             },
-            "squirrel": { // J/P平衡
+            "squirrel": { 
                 name: "松鼠", icon: "🐿️",
                 slogan: "敏捷的收藏家",
                 tags: ["未雨绸缪", "焦虑", "灵活"],
@@ -543,7 +540,7 @@
                 energy: "整理收藏品、找到高性价比的东西、解决突发的小麻烦。",
                 shadow: "容易陷入过度焦虑，囤积很多没用的东西，或者因为想做的事太多而一事无成。"
             },
-            "koala": { // S/N平衡
+            "koala": { 
                 name: "考拉", icon: "🐨",
                 slogan: "清醒的入世隐士",
                 tags: ["佛系", "旁观", "挑剔"],
@@ -553,7 +550,7 @@
                 energy: "睡觉、发呆、吃好吃的、被照顾。",
                 shadow: "可能会变得过于冷漠和懒散，对他人的痛苦无动于衷，逃避所有责任。"
             },
-            "unicorn": { // 极端NF
+            "unicorn": { 
                 name: "独角兽", icon: "🦄",
                 slogan: "纯粹的幻想生物",
                 tags: ["极致理想", "纯洁", "高维"],
@@ -563,7 +560,7 @@
                 energy: "做梦、创作、帮助弱小、感受到神圣的连接。",
                 shadow: "极度脆弱，容易被现实的残酷击碎。可能会因为无法忍受世界的瑕疵而选择彻底避世。"
             },
-            "crocodile": { // 极端ST
+            "crocodile": { 
                 name: "鳄鱼", icon: "🐊",
                 slogan: "冷酷的生存机器",
                 tags: ["现实", "耐心", "强者"],
@@ -575,7 +572,7 @@
             }
         };
 
-        // --- 逻辑控制 (保持不变) ---
+        // --- 逻辑控制 ---
         let currentQuestionIndex = 0;
         let scores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
         let historyStack = [];
@@ -624,7 +621,8 @@
             const q = currentQuestions[currentQuestionIndex];
             const progress = ((currentQuestionIndex) / currentQuestions.length) * 100;
             document.getElementById('progress-bar').style.width = `${progress}%`;
-            document.getElementById('quiz-progress-text').innerText = `QUESTION ${String(currentQuestionIndex + 1).padStart(2, '0')}`;
+            // 汉化：Question text
+            document.getElementById('quiz-progress-text').innerText = `第 ${String(currentQuestionIndex + 1).padStart(2, '0')} 题`;
             document.getElementById('question-text').innerText = q.q;
 
             const container = document.getElementById('options-container');
@@ -634,7 +632,6 @@
             
             q.options.forEach((opt, index) => {
                 const btn = document.createElement('button');
-                // 选项按钮也稍微加点颜色
                 btn.className = "option-btn w-full text-left p-5 rounded-2xl border-2 border-indigo-50 bg-white/80 hover:border-indigo-500 hover:bg-indigo-50 transition duration-200 text-gray-700 text-sm font-medium leading-relaxed mb-3";
                 
                 const label = labels[index] || (index + 1);
@@ -673,7 +670,8 @@
 
         function finishQuiz() {
             showPage('page-loading');
-            const loadingTexts = ["CALCULATING DIMENSIONS...", "ANALYZING SOCIAL INSTINCTS...", "MAPPING ARCHETYPE...", "GENERATING REPORT..."];
+            // 汉化：Loading texts
+            const loadingTexts = ["正在计算人格维度...", "分析社交本能...", "匹配动物原型...", "生成分析报告..."];
             let step = 0;
             const interval = setInterval(() => {
                 if (step < loadingTexts.length) {
