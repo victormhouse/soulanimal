@@ -28,10 +28,10 @@
         }
         .serif { font-family: 'Noto Serif SC', serif; }
         
-        /* --- 修改点 1: 定义黑体样式 --- */
+        /* 黑体样式 */
         .font-heiti { 
             font-family: "SimHei", "Heiti SC", "STHeiti", "Microsoft YaHei", sans-serif; 
-            font-weight: 700; /* 确保黑体足够粗 */
+            font-weight: 700; 
         }
 
         .fade-in { animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
@@ -165,9 +165,7 @@
         </div>
         <div class="flex-1 flex flex-col fade-in">
             <span class="text-xs font-bold text-gray-300 tracking-widest mb-4 block" id="quiz-progress-text">第 01 题</span>
-            
             <h2 id="question-text" class="text-xl font-heiti text-gray-800 mb-10 leading-relaxed">题目加载中...</h2>
-            
             <div id="options-container" class="space-y-3"></div>
         </div>
         <div class="mt-8 flex justify-between items-center opacity-0 transition-opacity" id="quiz-controls">
@@ -567,16 +565,17 @@
             const container = document.getElementById('options-container');
             container.innerHTML = '';
             
-            // --- 修改点 3: 自动添加 ABCD 选项前缀 ---
             const labels = ['A', 'B', 'C', 'D', 'E', 'F']; 
             
             q.options.forEach((opt, index) => {
                 const btn = document.createElement('button');
                 btn.className = "option-btn w-full text-left p-5 rounded-2xl border-2 border-gray-100 hover:border-gray-900 hover:bg-gray-50 transition duration-200 text-gray-700 text-sm font-medium leading-relaxed mb-3";
                 
-                // 这里将选项文字前加上 "A. " 等前缀
+                // 这里将 ABCD 放入独立的 span 并加粗加大
                 const label = labels[index] || (index + 1);
-                btn.innerText = `${label}. ${opt.t}`;
+                
+                // 修改: 使用 innerHTML，将 ABCD 设置为绿色、加粗、加大、并有右边距
+                btn.innerHTML = `<span class="text-green-700 font-bold text-lg mr-2">${label}.</span>${opt.t}`;
                 
                 btn.onclick = () => handleAnswer(opt.s);
                 btn.style.animation = `fadeIn 0.5s ease forwards ${index * 0.1}s`;
